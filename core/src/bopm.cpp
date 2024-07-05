@@ -5,15 +5,15 @@
 #include <iostream>
 
 namespace app {
-    long double binomialAmericanOption(const OptionParams& params) {
-        long double dt = params.days_to_expiration / 252 / params.steps; // Time Step
-        long double up = exp(params.sigma * sqrt(dt)); // Upward move
-        long double down = 1 / up; // Downward movement
-        long double risk_neutral_prob = (exp((params.r - params.q) * dt) - down) / (up - down); // Risk-neutral probability
-        long double disc = exp(-params.r * dt); // Discount rate
+    double binomialAmericanOption(const OptionParams& params) {
+        double dt = params.days_to_expiration / 252 / params.steps; // Time Step
+        double up = exp(params.sigma * sqrt(dt)); // Upward move
+        double down = 1 / up; // Downward movement
+        double risk_neutral_prob = (exp((params.r - params.q) * dt) - down) / (up - down); // Risk-neutral probability
+        double disc = exp(-params.r * dt); // Discount rate
 
-        std::vector<std::vector<long double>> stockPrices(params.steps + 1, std::vector<long double>(params.steps + 1));
-        std::vector<std::vector<long double>> optionValues(params.steps + 1, std::vector<long double>(params.steps + 1));
+        std::vector<std::vector<double>> stockPrices(params.steps + 1, std::vector<double>(params.steps + 1));
+        std::vector<std::vector<double>> optionValues(params.steps + 1, std::vector<double>(params.steps + 1));
 
         // Construct a vector of prices at strike
         stockPrices[0][0] = params.S;
@@ -26,9 +26,9 @@ namespace app {
 
         for (int node = 0; node <= params.steps; ++node) {
             if (params.isCall) {
-                optionValues[params.steps][node] = std::max(stockPrices[params.steps][node] - params.K, 0.0L);
+                optionValues[params.steps][node] = std::max(stockPrices[params.steps][node] - params.K, 0.0);
             } else {
-                optionValues[params.steps][node] = std::max(params.K - stockPrices[params.steps][node], 0.0L);
+                optionValues[params.steps][node] = std::max(params.K - stockPrices[params.steps][node], 0.0);
             }
         }
 
