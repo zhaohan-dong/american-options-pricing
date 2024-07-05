@@ -1,6 +1,8 @@
 {
     "makefile.makefilePath": "",
-    "cmake.sourceDirectory": "/Volumes/Diskette1/american-options-pricing/core",
+    "cmake.sourceDirectory": "${workspaceFolder}/core",
+    "cmake.buildDirectory": "${workspaceFolder}/core/build",
+    "cmake.generator": "Unix Makefiles",
     "files.associations": {
         "vector": "cpp",
         "__bit_reference": "cpp",
@@ -44,6 +46,13 @@
         "tuple": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "__hash_table": "cpp",
+        "__node_handle": "cpp",
+        "deque": "cpp",
+        "optional": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "unordered_map": "cpp"
     }
 }

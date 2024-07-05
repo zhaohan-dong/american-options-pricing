@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include "bopm.hpp"
 
-void parseArguments(int argc, char *argv[], OptionParams &params) {
+void parseArguments(int argc, char *argv[], app::OptionParams &params) {
     int opt;
     bool interactiveMode = false;
     bool has_S = false, has_K = false, has_r = false, has_T = false, has_s = false, has_n = false;
@@ -70,7 +70,7 @@ void parseArguments(int argc, char *argv[], OptionParams &params) {
 }
 
 int main(int argc, char *argv[]) {
-    OptionParams params;
+    app::OptionParams params;
 
     try {
         parseArguments(argc, argv, params);
@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
         long double option_price = app::binomialAmericanOption(params);
 
         std::cout << option_price << '\n';
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+    } catch (const std::exception& error) {
+        std::cerr << "Error: " << error.what() << std::endl;
         return EXIT_FAILURE;
     }
     exit(EXIT_SUCCESS);
