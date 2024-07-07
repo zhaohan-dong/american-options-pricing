@@ -1,30 +1,30 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, {Secret} from "jsonwebtoken";
+import {parse} from "node:url";
 
 const SECRET: Secret = process.env.JWT_SECRET as Secret;
 
+/* https://stackoverflow.com/questions/4361173/http-headers-in-websockets-client-api Method 1 the query string
+ * Didn't use the header method because that messes up the websocket server setup
+ */
 export function authenticateWss(req: Request, res: Response, next: NextFunction) {
+    const accessToken = parse(req.url, true).query['accessToken'] as string;
 
-    const token = req.headers.authorization;
-
-    if (!token || !token.startsWith("Bearer ")) {
-        res.status(401).send('Unauthorized');
+    if (!accessToken) {
+        console.error("Access token is missing");
         return next(new Error('Unauthorized'));
     }
 
-    const jwtToken = token.split(' ')[1];
-
-    jwt.verify(jwtToken, SECRET!, (err, decoded) => {
+    jwt.verify(accessToken, SECRET, (err, decoded) => {
         if (err) {
-            // res.status(401).send('Unauthorized'); // Invalid token
+            console.error("Access token unauthorized");
             return next(new Error('Unauthorized'));
         } else {
-            // Token is valid, decoded contains the payload
             next(); // Continue processing
         }
     });
 }
 
 export function authenticateUser(username: string, password: string): boolean {
-    return username === 'example_user' && password === 'password'
+    return true
 }

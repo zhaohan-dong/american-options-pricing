@@ -11,6 +11,11 @@ import {OptionsWss} from "./wss-routes/options";
 import {authenticateWss} from "./utils/auth";
 import {authRouter} from "./routes/auth";
 
+if (!process.env.JWT_SECRET) {
+    console.error('No JWT secret found. Set JWT_SECRET environment variable.');
+    process.exit(1);
+}
+
 // Setup Express as HTTP Route
 class ExpressApp {
     public app: Express;
@@ -43,6 +48,9 @@ class HttpServer {
     }
 
     private startServer() {
+        if (!process.env.PORT) {
+            console.log("No port specified, running on port 3000")
+        }
         const port = process.env.PORT || 3000;
 
         // Create HTTP server and attach the express app
