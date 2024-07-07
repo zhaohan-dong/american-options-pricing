@@ -1,9 +1,8 @@
 import util from 'util';
 import path from "path";
-import {WebSocketServer} from "ws";
 const exec = util.promisify(require('child_process').exec);
 
-interface OptionsParams {
+export interface OptionsParams {
     price: number,
     strike: number,
     riskFreeRate: number,
@@ -24,14 +23,18 @@ export class OptionsService {
             throw new Error('Options Pricing - Invalid input: all arguments besides isCall must be numbers');
         }
 
+        const optionsCalculationStartTime = performance.now();
+
         const {stdout, stderr} = await exec(
             `${path.join(__dirname, '../bin/BinomialAmericanOption')} -S ${args.price} -K ${args.strike} -r ${args.riskFreeRate} -q ${args.dividendYield} -T ${args.daysToExpiration} -s ${args.volatility} -n ${args.stepsOfBimodalTree} ${args.isCall ? '-c' : '-p'}`
         );
 
+        const optionsCalculationEndTime = performance.now();
+
         if (stderr) {
             console.error('Options Pricing - Error:', stderr);
         } else {
-            console.log('Options Pricing - Output:', stdout);
+            console.log('Options Pricing - Calculation Milliseconds:', optionsCalculationEndTime - optionsCalculationStartTime);
         }
 
         const outputValue = parseFloat(stdout);
