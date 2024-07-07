@@ -47,7 +47,7 @@ export class OptionsWss {
             });
 
             ws.on('close', () => {
-                console.log('WebSocketServer - client disconnected');
+                console.log('WebSocketServer - Client disconnected');
             });
         });
     }

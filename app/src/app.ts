@@ -1,10 +1,15 @@
+import path from "path";
+import {default as dotenv} from "dotenv";
+dotenv.config({path: path.join(__dirname, '../.env.local')});
+
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import * as http from "node:http";
 import {Express} from "express";
 import express from 'express';
 import {OptionsWss} from "./wss-routes/options";
-import {authenticate} from "./utils/auth";
+import {authenticateWss} from "./utils/auth";
+import {authRouter} from "./routes/auth";
 
 // Setup Express as HTTP Route
 class ExpressApp {
@@ -24,7 +29,7 @@ class ExpressApp {
     }
 
     private setupRoutes(): void {
-        // this.app.use('/', indexRouter);
+        this.app.use(authRouter);
     }
 }
 
@@ -47,8 +52,8 @@ class HttpServer {
         });
 
         this.server.on('upgrade', (req, socket, head) => {
-            // Call your authentication middleware before upgrading
-            authenticate(req as express.Request, {} as express.Response, (err?: any) => {
+            // Call authentication middleware before upgrading
+            authenticateWss(req as express.Request, {} as express.Response, (err?: any) => {
                 if (err) {
                     socket.write('HTTP/1.1 401 Unauthorized\n\n');
                     socket.destroy();
