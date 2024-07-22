@@ -50,3 +50,20 @@ It will return a ephemeral token for upgrading connection with the WebSocket ser
 For more info on securing WebSocket Server, see [this article on StackOverflow](https://stackoverflow.com/questions/4361173/http-headers-in-websockets-client-api).
 
 > Currently the token is set for longer expiration time for debugging and development purposes. Check `src/routes/auth.ts`.
+
+The request body format:
+
+```
+{
+    requestTime: string,  // For logging purposes in future
+    price: number,
+    strike: number,
+    riskFreeRate: number,
+    dividendYield: number,
+    daysToExpiration: number,
+    volatility: number,
+    stepsOfBimondalTree: number,
+    isCall: boolean
+}
+
+```
