@@ -13,7 +13,7 @@ authRouter.post("/auth", async (req, res) => {
 
     if (authenticateUser(username, password)) {
         // User is authenticated, generate JWT token
-        const accessToken = jwt.sign({ username }, SECRET, { expiresIn: '1s' });
+        const accessToken = jwt.sign({ username }, SECRET, { expiresIn: '6h' });
 
         // Return the token to the client
         res.json({ accessToken });

@@ -6,14 +6,14 @@ interface OptionsWssParams extends OptionsParams {
     "requestTime": number
 }
 
-export class OptionsWss {
-    public wss: WebSocketServer;
+export class OptionsWebSocketServer {
+    public wsServer: WebSocketServer;
     private wssServerPath: string = "/options";
 
     constructor(httpServer: http.Server) {
         // Initialize the server
-        this.wss = new WebSocketServer({ server: httpServer, path: this.wssServerPath })
-        this.setupWebSocket(this.wss);
+        this.wsServer = new WebSocketServer({ server: httpServer, path: this.wssServerPath })
+        this.setupWebSocket(this.wsServer);
     }
 
     private setupWebSocket(wss: WebSocketServer): void {

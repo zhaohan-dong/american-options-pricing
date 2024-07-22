@@ -7,7 +7,7 @@ import logger from 'morgan';
 import * as http from "node:http";
 import {Express} from "express";
 import express from 'express';
-import {OptionsWss} from "./wss-routes/options";
+import {OptionsWebSocketServer} from "./wss-routes/options";
 import {authenticateWss} from "./utils/auth";
 import {authRouter} from "./routes/auth";
 
@@ -40,6 +40,7 @@ class ExpressApp {
 
 export const expressApp = new ExpressApp();
 
+// Setup http server with express app
 class HttpServer {
     public server?: http.Server;
 
@@ -49,14 +50,14 @@ class HttpServer {
 
     private startServer() {
         if (!process.env.PORT) {
-            console.log("No port specified, running on port 3000")
+            console.log("No port specified, running on default port 8080")
         }
-        const port = process.env.PORT || 3000;
+        const port = process.env.PORT || 8080;
 
         // Create HTTP server and attach the express app
         this.server = http.createServer(expressApp.app);
         this.server.listen(port, () => {
-            console.log(`Server started at http://localhost:${port}`);
+            console.log(`Server started at port ${port}`);
         });
 
         this.server.on('upgrade', (req, socket, head) => {
@@ -73,4 +74,4 @@ class HttpServer {
 }
 
 export const httpServer = new HttpServer();
-export const wssServer = new OptionsWss(httpServer.server!)
+export const wssServer = new OptionsWebSocketServer(httpServer.server!)
