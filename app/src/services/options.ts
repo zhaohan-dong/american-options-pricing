@@ -25,6 +25,7 @@ export class OptionsService {
 
         const optionsCalculationStartTime = performance.now();
 
+        // Execute the compiled binary
         const {stdout, stderr} = await exec(
             `${path.join(__dirname, '../bin/BinomialAmericanOption')} -S ${args.price} -K ${args.strike} -r ${args.riskFreeRate} -q ${args.dividendYield} -T ${args.daysToExpiration} -s ${args.volatility} -n ${args.stepsOfBimodalTree} ${args.isCall ? '-c' : '-p'}`
         );

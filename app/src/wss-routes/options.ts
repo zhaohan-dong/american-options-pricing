@@ -24,7 +24,7 @@ export class OptionsWebSocketServer {
                 console.log('WebSocketServer - Received pricing request from client');
 
                 let body: OptionsWssParams | null = null;
-                const startTime = performance.now();
+                const startTime = performance.now();  // Use performance.now() because the clock is monotonic
 
                 // Parse body, or disconnect
                 try {
