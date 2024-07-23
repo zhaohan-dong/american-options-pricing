@@ -17,7 +17,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y cmake
       
       - name: Build
-        run: cmake -S core/src --build build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ github.ref_name }}
+        run: cmake -S core/src --B build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ github.ref_name }}
 
       - name: Package
         run: |
