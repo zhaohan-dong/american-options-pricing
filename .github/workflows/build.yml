@@ -26,12 +26,12 @@ jobs:
       - name: Build
         run: cmake -S core -B build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ env.VERSION }}
 
-      - name: Check build
-        run: ls build/out
-
       - name: Package
         run: |
           mkdir release
+          cd build
+          make
+          cd ..
           cp build/out/BinomialAmericanOption release/
           tar -czvf release_${{ github.ref_name }}.tar.gz -C release .
 
