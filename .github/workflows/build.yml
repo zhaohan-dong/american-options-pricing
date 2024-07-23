@@ -29,6 +29,7 @@ jobs:
       - name: Package
         run: |
           mkdir release
+          ls build/out
           cp build/out/BinomialAmericanOption release/
           tar -czvf release_${{ github.ref_name }}.tar.gz -C release .
 
