@@ -13,17 +13,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Set up CMake
         run: sudo apt-get update && sudo apt-get install -y cmake
       
       - name: Build
-        run: cmake -S core -B build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ github.ref_name }}
+        run: cmake -S core -B build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ env.VERSION }}
 
       - name: Package
         run: |
           mkdir release
           cp build/out/* release/
-          cp LICENSE release/
           tar -czvf release_${{ github.ref_name }}.tar.gz -C release .
 
       - name: Release
