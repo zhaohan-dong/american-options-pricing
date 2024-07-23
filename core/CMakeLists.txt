@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Set the project name and version
-set(PROJECT_VERSION "" CACHE STRING "Project version")
-project(BinomialAmericanOption VERSION ${PROJECT_VERSION})
+project(BinomialAmericanOption VERSION 0.0.0)
+
+# Override version if provided as a command-line argument
+if(DEFINED PROJECT_VERSION)
+    set(PROJECT_VERSION ${PROJECT_VERSION} CACHE STRING "Project version" FORCE)
+endif()
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
