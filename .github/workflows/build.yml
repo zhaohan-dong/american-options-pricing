@@ -1,0 +1,33 @@
+name: Build with CMake
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build-project:
+    name: Build Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        run: sudo apt-get update && sudo apt-get install -y cmake
+      
+      - name: Build
+        run: cmake -S core/src --build build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ github.ref_name }}
+
+      - name: Package
+        run: |
+          mkdir release
+          cp build/out/* release/
+          cp LICENSE release/
+          tar -czvf release_${{ github.ref_name }}.tar.gz -C release .
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: release_${{ github.ref_name }}.tar.gz
