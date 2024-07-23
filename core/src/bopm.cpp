@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 namespace app
 {
@@ -11,10 +12,11 @@ float binomialAmericanOption(const app::OptionParams &params)
 
     // Throw error if the steps exceeds max binomial steps set
     // Because we use two arrays instead of vectors
-    if (params.steps > MAXIMUM_BINOMIAL_STEPS - 1) {
-        std::ostringstream oss;
-        oss << "Specified number of binomial steps exceeded maximum set at compile time: " << (MAXIMUM_BINOMIAL_STEPS - 1);
-        throw std::runtime_error(oss.str());
+    if (params.steps > MAXIMUM_BINOMIAL_STEPS - 1)
+    {
+        std::stringstream ss;
+        ss << "Specified number of binomial steps exceeded maximum set at compile time: " << (MAXIMUM_BINOMIAL_STEPS - 1);
+        throw std::runtime_error(ss.str());
     }
 
     // Initialize the parameters
