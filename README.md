@@ -22,10 +22,10 @@ Arguments:
 
 - `-S` Stock Price (underlying)
 - `-K` Strike
-- `-r` Risk-free rate
-- `-q` Dividend yield
-- `-T` Days to expiration (in days, assuming 252 days per year)
-- `-s` Volatility
+- `-r` Risk-free rate in decimal (not percentage)
+- `-q` Dividend yield in decimal (not percentage)
+- `-T` Days to expiration (in days, assuming 365 days per year)
+- `-s` Volatility of underlying/IV in decimal (not percentage)
 - `-n` Number of steps on the binomial tree
 - `-c` is call, otherwise put or `-p`
 
