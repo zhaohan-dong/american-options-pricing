@@ -5,7 +5,7 @@
 #define MAXIMUM_BINOMIAL_STEPS 10000
 #endif
 
-#ifndef DAYS_PER_YEAR 365
+#ifndef DAYS_PER_YEAR
 #define DAYS_PER_YEAR 365
 #endif
 
