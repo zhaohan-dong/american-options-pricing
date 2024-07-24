@@ -16,6 +16,9 @@ To build the core module, install CMake version >= 3.10, and run
 
 ```shell
 cmake core
+
+# Go to the build folder, then
+make
 ```
 
 The output binary is in `./core/build/out/BinomialAmericanOption`
@@ -31,7 +34,7 @@ Arguments:
 - `-n` Number of steps on the binomial tree
 - `-c` is call, otherwise put or `-p`
 
-The maximum steps is set to be 10,000. This can be overriden in `core/include/bopm.hpp`
+The maximum steps is set to be 1,000. This can be overriden in `core/include/bopm.hpp`
 
 The calculation uses an array of array pointers. This would be faster than representing each node in a binary tree.
 

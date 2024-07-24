@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BUILDPLATFORM: linux/arm64
+        BUILDPLATFORM: ${BUILDPLATFORM}
         IMAGE_VERSION: ${IMAGE_VERSION}
-        CORE_VERSION: ${VERSION}
+        CORE_VERSION: ${CORE_VERSION}
     image: binomial-option-pricing:${IMAGE_VERSION}
     environment:
       PORT: 8080
