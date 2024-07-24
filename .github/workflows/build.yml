@@ -32,10 +32,10 @@ jobs:
           make
           cd ..
           cp build/out/BinomialAmericanOption release/
-          tar -czvf release_${{ github.ref_name }}.tar.gz -C release .
+          tar -czvf binomial-american-option-${{ github.ref_name }}-linux-x86_64.tar.gz -C release .
 
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: release_${{ github.ref_name }}.tar.gz
+          files: binomial-american-option-${{ github.ref_name }}-linux-x86_64.tar.gz
