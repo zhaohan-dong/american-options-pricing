@@ -15,6 +15,7 @@ function(read_version_from_file VERSION_FILE VERSION_VAR)
         message(FATAL_ERROR "Version file ${VERSION_FILE} not found.")
     endif()
 endfunction()
+
 set(VERSION_FILE "${CMAKE_SOURCE_DIR}/../VERSION")
 read_version_from_file(${VERSION_FILE} PROJECT_VERSION)
 

@@ -1,5 +1,7 @@
 # American Options Pricing
 
+[![Build Binaries with CMake](https://github.com/zhaohan-dong/american-options-pricing/actions/workflows/build-binary.yml/badge.svg?branch=main)](https://github.com/zhaohan-dong/american-options-pricing/actions/workflows/build-binary.yml)
+
 This is a repo for American Options pricing. Usually the trading apps will give a Black-Scholes model output, which is only valid for European Options.
 
 The core module contains C++ code for calculating the options pricing.
