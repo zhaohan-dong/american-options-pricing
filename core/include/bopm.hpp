@@ -11,6 +11,13 @@
 
 namespace app
 {
+
+enum OptionType
+{
+    put,
+    call
+};
+
 struct OptionParams
 {
     float S;                  // Current stock price
@@ -20,8 +27,10 @@ struct OptionParams
     float days_to_expiration; // Time to maturity in days
     float sigma;              // Volatility in decimal
     int steps; // Number of binomial steps (starting with 0, so total steps + 1)
-    bool isCall = true; // Option type (true for call, false for put)
+    OptionType isCall =
+        OptionType::call; // Option type (true for call, false for put)
 };
+
 float binomialAmericanOption(const OptionParams &params);
 } // namespace app
 

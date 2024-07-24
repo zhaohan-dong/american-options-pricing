@@ -53,6 +53,8 @@
         "optional": "cpp",
         "queue": "cpp",
         "stack": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp"
     }
 }

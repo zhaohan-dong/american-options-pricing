@@ -7,6 +7,7 @@
 
 namespace app
 {
+
 float binomialAmericanOption(const app::OptionParams &params)
 {
 
@@ -15,7 +16,9 @@ float binomialAmericanOption(const app::OptionParams &params)
     if (params.steps > MAXIMUM_BINOMIAL_STEPS - 1)
     {
         std::stringstream ss;
-        ss << "Specified number of binomial steps exceeded maximum set at compile time: " << (MAXIMUM_BINOMIAL_STEPS - 1);
+        ss << "Specified number of binomial steps exceeded maximum set at "
+              "compile time: "
+           << (MAXIMUM_BINOMIAL_STEPS - 1);
         throw std::runtime_error(ss.str());
     }
 
@@ -26,8 +29,8 @@ float binomialAmericanOption(const app::OptionParams &params)
     float down = 1 / up; // Downward movement
     float risk_neutral_prob = (exp((params.r - params.q) * dt) - down) /
                               (up - down); // Risk-neutral probability
-    float disc =
-        exp(-params.r * dt); // Discount rate to multiply PV with and get FV
+    float disc = exp(-params.r * dt); // Discount rate to multiply PV with and
+                                      // get FV (continuous discounting)
 
     // Initialize arrays (use array pointer because of limited stack size)
     std::array<std::array<float, MAXIMUM_BINOMIAL_STEPS> *,
@@ -58,40 +61,25 @@ float binomialAmericanOption(const app::OptionParams &params)
 
     for (int node = 0; node <= params.steps; ++node)
     {
-        if (params.isCall)
-        {
-            (*optionValues[params.steps])[node] =
-                std::max((*stockPrices[params.steps])[node] - params.K, 0.0f);
-        }
-        else
-        {
-            (*optionValues[params.steps])[node] =
-                std::max(params.K - (*stockPrices[params.steps])[node], 0.0f);
-        }
+        (*optionValues[params.steps])[node] =
+            params.isCall
+                ? std::max((*stockPrices[params.steps])[node] - params.K, 0.0f)
+                : std::max(params.K - (*stockPrices[params.steps])[node], 0.0f);
     }
 
     for (int step = params.steps - 1; step >= 0; --step)
     {
         for (int node = 0; node <= step; ++node)
         {
-            if (params.isCall)
-            {
-                (*optionValues[step])[node] =
-                    std::max((*stockPrices[step])[node] - params.K,
-                             disc * (risk_neutral_prob *
-                                         (*optionValues[step + 1])[node] +
-                                     (1 - risk_neutral_prob) *
-                                         (*optionValues[step + 1])[node + 1]));
-            }
-            else
-            {
-                (*optionValues[step])[node] =
-                    std::max(params.K - (*stockPrices[step])[node],
-                             disc * (risk_neutral_prob *
-                                         (*optionValues[step + 1])[node] +
-                                     (1 - risk_neutral_prob) *
-                                         (*optionValues[step + 1])[node + 1]));
-            }
+            float stockPrice = (*stockPrices[step])[node];
+            float exerciseValue = params.isCall
+                                      ? std::max(stockPrice - params.K, 0.0f)
+                                      : std::max(params.K - stockPrice, 0.0f);
+            float holdValue =
+                disc *
+                (risk_neutral_prob * (*optionValues[step + 1])[node + 1] +
+                 (1 - risk_neutral_prob) * (*optionValues[step + 1])[node]);
+            (*optionValues[step])[node] = std::max(exerciseValue, holdValue);
         }
     }
     for (int i = 0; i <= params.steps; ++i)
@@ -101,4 +89,5 @@ float binomialAmericanOption(const app::OptionParams &params)
 
     return (*optionValues[0])[0];
 }
+
 } // namespace app
