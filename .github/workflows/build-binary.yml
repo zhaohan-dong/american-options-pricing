@@ -1,0 +1,135 @@
+name: Build Binaries with CMake
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build-linux-amd64:
+    name: Build for linux/amd64 architecture
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y \
+          gcc-x86-64-linux-gnu \
+          g++-x86-64-linux-gnu \
+          cmake
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Configure CMake for linux-amd64
+        id: configure_cmake
+        run: cmake -S core -B build -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ env.VERSION }}
+
+      - name: Build
+        id: build
+        run: |
+          mkdir release
+          cd build
+          make
+          cd ..
+
+      - name: Package Binary
+        id: package_binary
+        run: |
+          cp build/out/BinomialAmericanOption release/
+          tar -czvf binomial-american-option-${{ github.ref_name }}-linux-x86_64.tar.gz -C release .
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: binomial-american-option-${{ github.ref_name }}-linux-x86_64.tar.gz
+
+  build-linux-aarch64:
+    name: Build Project for linux/aarch64 architecture
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: aarch64
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y \
+          gcc-aarch64-linux-gnu \
+          g++-aarch64-linux-gnu \
+          cmake
+
+      - name: Configure CMake for aarch64
+        id: configure_cmake
+        run: |
+          mkdir -p build
+          cmake -S core -B build -DCMAKE_TOOLCHAIN_FILE=../aarch64-toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DPROJECT_VERSION=${{ env.VERSION }}
+
+      - name: Build
+        id: build
+        run: |
+          cd build
+          make
+          cd ..
+
+      - name: Package
+        id: package_binary
+        run: |
+          mkdir release
+          cp build/out/BinomialAmericanOption release/
+          tar -czvf binomial-american-option-${{ github.ref_name }}-linux-aarch64.tar.gz -C release .
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: binomial-american-option-${{ github.ref_name }}-linux-aarch64.tar.gz
+
+  bump-version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'created' && startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Update version file
+        id: update_version_file
+        run: |
+          echo ${{ env.VERSION }} > core/VERSION
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add core/VERSION
+          git commit -m "Bump core version to ${{ env.VERSION }}"
+
+      - name: Push changes
+        run: git push origin HEAD:main

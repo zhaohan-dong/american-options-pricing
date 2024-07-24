@@ -1,17 +1,28 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Set the project name and version
-project(BinomialAmericanOption VERSION 0.0.0)
-
-# Override version if provided as a command-line argument
-if(DEFINED PROJECT_VERSION)
-    set(PROJECT_VERSION ${PROJECT_VERSION} CACHE STRING "Project version" FORCE)
-endif()
-
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+
+# Read project version from ./VERSION
+function(read_version_from_file VERSION_FILE VERSION_VAR)
+    if(EXISTS ${VERSION_FILE})
+        file(READ ${VERSION_FILE} VERSION_CONTENTS)
+        string(STRIP ${VERSION_CONTENTS} VERSION_CONTENTS)
+        set(${VERSION_VAR} ${VERSION_CONTENTS} PARENT_SCOPE)
+    else()
+        message(FATAL_ERROR "Version file ${VERSION_FILE} not found.")
+    endif()
+endfunction()
+set(VERSION_FILE "${CMAKE_SOURCE_DIR}/VERSION")
+read_version_from_file(${VERSION_FILE} PROJECT_VERSION)
+
+# Set the project name and version
+project(BinomialAmericanOption VERSION ${PROJECT_VERSION})
+
+
+# Set default build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
