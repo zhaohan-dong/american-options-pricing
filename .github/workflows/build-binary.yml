@@ -6,11 +6,43 @@ on:
   workflow_dispatch:
 
 jobs:
+  bump-version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: startsWith(github.ref, 'refs/tags/') && github.event_name == 'release' && github.event.action == 'created'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Update version file
+        id: update_version_file
+        run: |
+          echo ${{ env.VERSION }} > core/VERSION
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add core/VERSION
+          git commit -m "Bump core version to ${{ env.VERSION }}"
+
+      - name: Push changes
+        run: git push origin HEAD:main
+
   build-linux-amd64:
     name: Build for linux/amd64 architecture
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    needs: bump-version
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,6 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    needs: bump-version
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -98,44 +131,3 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: binomial-american-option-${{ github.ref_name }}-linux-aarch64.tar.gz
-
-  bump-version:
-    name: Bump Version
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    # if: startsWith(github.ref, 'refs/tags/') && github.event_name == 'release' && github.event.action == 'created'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      # - name: Extract version from tag
-      #   id: extract_version
-      #   run: |
-      #     TAG=${GITHUB_REF#refs/tags/}
-      #     VERSION=${TAG#v}
-      #     echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      # - name: Update version file
-      #   id: update_version_file
-      #   run: |
-      #     echo ${{ env.VERSION }} > core/VERSION
-      #     git config --global user.name 'github-actions'
-      #     git config --global user.email 'github-actions@github.com'
-      #     git add core/VERSION
-      #     git commit -m "Bump core version to ${{ env.VERSION }}"
-
-      - name: Update version file
-        id: update_version_file
-        run: |
-          echo "VERSION=0.1.1" >> $GITHUB_ENV
-          echo ${{ env.VERSION }} > core/VERSION
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git add core/VERSION
-          git commit -m "Bump core version to ${{ env.VERSION }}"
-
-      - name: Push changes
-        run: git push origin HEAD:build-action
