@@ -14,14 +14,18 @@ COPY core ./core
 RUN VERSION=$(cat /app/core/VERSION) && \
     if [ "${BUILDPLATFORM}" = "linux/amd64" ]; then \
     echo "Fetching and extracting tarball for platform: ${BUILDPLATFORM}" && \
-    curl -OL "https://github.com/zhaohan-dong/american-options-pricing/releases/download/v${CORE_VERSION}/release_v${CORE_VERSION}.tar.gz" && \
-    tar -xzvf release_v${CORE_VERSION}.tar.gz -C /app; \
+    curl -OL "https://github.com/zhaohan-dong/american-options-pricing/releases/download/v${CORE_VERSION}/binomial-american-option-v${CORE_VERSION}-linux-x86_64.tar.gz" && \
+    tar -xzvf binomial-american-option-v${CORE_VERSION}-linux-x86_64.tar.gz -C /app; \
+    elif [ "${BUILDPLATFORM}" = "linux/arm64" ]; then \
+    echo "Fetching and extracting tarball for platform: ${BUILDPLATFORM}" && \
+    curl -OL "https://github.com/zhaohan-dong/american-options-pricing/releases/download/v${CORE_VERSION}/binomial-american-option-v${CORE_VERSION}-linux-aarch64.tar.gz" && \
+    tar -xzvf binomial-american-option-v${CORE_VERSION}-linux-aarch64.tar.gz -C /app; \
     else \
     echo "Skipping tarball fetch for platform: ${BUILDPLATFORM}"; \
     fi
 
 # Conditional build step if tarball is not used
-RUN if [ "${BUILDPLATFORM}" != "linux/amd64" ]; then \
+RUN if [ "${BUILDPLATFORM}" != "linux/amd64" ] && [ "${BUILDPLATFORM}" != "linux/arm64" ]; then \
     echo "Building for platform: ${BUILDPLATFORM}" && \
     apt-get update && apt-get install -y cmake && \
     mkdir -p /app/build && \
