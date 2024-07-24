@@ -7,7 +7,44 @@
 
 namespace app
 {
-float binomialAmericanOption(const app::OptionParams &params)
+
+using StockAndOptionsArray =
+    std::array<std::array<float, MAXIMUM_BINOMIAL_STEPS> *,
+               MAXIMUM_BINOMIAL_STEPS>;
+
+class IntermediateParams
+{
+  private:
+    float dt;
+    float up;
+    float down;
+    float risk_neutral_prob;
+    float discount_rate;
+
+  public:
+    IntermediateParams(OptionParams &params)
+    {
+        {
+            // Initialize the parameters
+            dt = params.days_to_expiration / DAYS_PER_YEAR /
+                 params.steps;                 // Time Step
+            up = exp(params.sigma * sqrt(dt)); // Upward move
+            down = 1 / up;                     // Downward movement
+            risk_neutral_prob = (exp((params.r - params.q) * dt) - down) /
+                                (up - down); // Risk-neutral probability
+            discount_rate = exp(
+                -params.r * dt); // Discount rate to multiply PV with and get FV
+        }
+    }
+};
+
+// void setStockAndOptionArrays(OptionParams &params,
+//                              StockAndOptionsArray &stockArray,
+//                              StockAndOptionsArray &optionArray)
+// {
+// }
+
+OptionsResult binomialAmericanOption(const app::OptionParams &params)
 {
 
     // Throw error if the steps exceeds max binomial steps set
@@ -15,7 +52,9 @@ float binomialAmericanOption(const app::OptionParams &params)
     if (params.steps > MAXIMUM_BINOMIAL_STEPS - 1)
     {
         std::stringstream ss;
-        ss << "Specified number of binomial steps exceeded maximum set at compile time: " << (MAXIMUM_BINOMIAL_STEPS - 1);
+        ss << "Specified number of binomial steps exceeded maximum set at "
+              "compile time: "
+           << (MAXIMUM_BINOMIAL_STEPS - 1);
         throw std::runtime_error(ss.str());
     }
 
@@ -30,17 +69,15 @@ float binomialAmericanOption(const app::OptionParams &params)
         exp(-params.r * dt); // Discount rate to multiply PV with and get FV
 
     // Initialize arrays (use array pointer because of limited stack size)
-    std::array<std::array<float, MAXIMUM_BINOMIAL_STEPS> *,
-               MAXIMUM_BINOMIAL_STEPS>
-        stockPrices{};
-    std::array<std::array<float, MAXIMUM_BINOMIAL_STEPS> *,
-               MAXIMUM_BINOMIAL_STEPS>
-        optionValues{};
+    StockAndOptionsArray stockPrices{};
+    StockAndOptionsArray optionValues{};
     for (int i = 0; i <= params.steps; ++i)
     {
         stockPrices[i] = new std::array<float, MAXIMUM_BINOMIAL_STEPS>();
         optionValues[i] = new std::array<float, MAXIMUM_BINOMIAL_STEPS>();
     }
+
+    IntermediateParams intermediateParam{params};
 
     // Construct an array of prices at strike
     (*stockPrices[0])[0] = params.S;
@@ -94,11 +131,12 @@ float binomialAmericanOption(const app::OptionParams &params)
             }
         }
     }
+
     for (int i = 0; i <= params.steps; ++i)
     {
         delete stockPrices[i];
     }
 
-    return (*optionValues[0])[0];
+    return {(*optionValues[0])[0], 0};
 }
 } // namespace app

@@ -22,7 +22,26 @@ struct OptionParams
     int steps; // Number of binomial steps (starting with 0, so total steps + 1)
     bool isCall = true; // Option type (true for call, false for put)
 };
-float binomialAmericanOption(const OptionParams &params);
+
+class IntermediateParams
+{
+    float dt;
+    float up;
+    float down;
+    float risk_neutral_prob;
+    float discount_rate;
+
+    IntermediateParams(OptionParams &params);
+};
+
+struct OptionsResult
+{
+    float price;
+    float delta;
+};
+
+OptionsResult binomialAmericanOption(const OptionParams &params);
+
 } // namespace app
 
 #endif

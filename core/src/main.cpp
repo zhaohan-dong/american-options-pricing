@@ -113,9 +113,9 @@ int main(int argc, char *argv[])
     {
         parseArguments(argc, argv, params);
 
-        float option_price = app::binomialAmericanOption(params);
+        app::OptionsResult option_price = app::binomialAmericanOption(params);
 
-        std::cout << option_price << '\n';
+        std::cout << option_price.price << '\n';
     }
     catch (const std::exception &error)
     {
