@@ -11,8 +11,7 @@ WORKDIR /app
 COPY core ./core
 
 # Conditional fetch and extraction
-RUN VERSION=$(cat /app/core/VERSION) && \
-    if [ "${BUILDPLATFORM}" = "linux/amd64" ]; then \
+RUN if [ "${BUILDPLATFORM}" = "linux/amd64" ]; then \
     echo "Fetching and extracting tarball for platform: ${BUILDPLATFORM}" && \
     curl -OL "https://github.com/zhaohan-dong/american-options-pricing/releases/download/v${CORE_VERSION}/binomial-american-option-v${CORE_VERSION}-linux-x86_64.tar.gz" && \
     tar -xzvf binomial-american-option-v${CORE_VERSION}-linux-x86_64.tar.gz -C /app; \
