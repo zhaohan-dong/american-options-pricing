@@ -46,7 +46,7 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v2
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        if: github.event.workflow_run
         with:
           name: v${{ env.VERSION }}
           tag_name: v${{ env.VERSION }}
@@ -97,7 +97,7 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v2
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        if: github.event.workflow_run
         with:
           name: v${{ env.VERSION }}
           tag_name: v${{ env.VERSION }}
