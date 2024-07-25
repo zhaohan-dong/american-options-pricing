@@ -9,20 +9,56 @@
 #define DAYS_PER_YEAR 365
 #endif
 
+#include <array>
+
 namespace app
 {
-struct OptionParams
+
+struct Node
 {
-    float S;                  // Current stock price
-    float K;                  // Strike price
-    float r;                  // Risk-free rate in decimal
-    float q = 0;              // Dividend yield in decimal
-    float days_to_expiration; // Time to maturity in days
-    float sigma;              // Volatility in decimal
-    int steps; // Number of binomial steps (starting with 0, so total steps + 1)
-    bool isCall = true; // Option type (true for call, false for put)
+    float stockPrice;
+    float optionValue;
 };
-float binomialAmericanOption(const OptionParams &params);
+
+using StockAndOptionPriceStep = std::array<Node, MAXIMUM_BINOMIAL_STEPS>;
+using StockAndOptionPriceArray =
+    std::array<StockAndOptionPriceStep *, MAXIMUM_BINOMIAL_STEPS>;
+
+enum OptionType
+{
+    put,
+    call
+};
+
+void calcStockPricesTillTerminalTime(
+    const InputParams &params, const BinomialTreeParams &binomialTreeParams,
+    StockAndOptionPriceArray &stockAndOptionPricesArray);
+
+struct InputParams
+{
+    float underlyingPrice;   // Current stock price
+    float strike;            // Strike price
+    float riskFreeRate;      // Risk-free rate in decimal
+    float dividendYield = 0; // Dividend yield in decimal
+    float daysToExpiration;  // Time to maturity in days
+    float sigma;             // Volatility in decimal
+    int steps; // Number of binomial steps (starting with 0, so total steps + 1)
+    OptionType isCall =
+        OptionType::call; // Option type (true for call, false for put)
+};
+
+class BinomialTreeParams
+{
+  public:
+    float dt;
+    float up;
+    float down;
+    float riskNeutralProb;
+    float discountRate;
+    BinomialTreeParams(const InputParams &params);
+};
+
+float binomialAmericanOption(const InputParams &params);
 } // namespace app
 
 #endif
