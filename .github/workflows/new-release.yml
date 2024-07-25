@@ -27,10 +27,10 @@ jobs:
       - name: Update version file
         id: update_version_file
         run: |
-          echo ${{ env.VERSION }} > core/VERSION
+          echo ${{ env.VERSION }} > VERSION
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add core/VERSION
+          git add VERSION
           git commit -m "Bump core version to ${{ env.VERSION }}"
 
       - name: Push changes

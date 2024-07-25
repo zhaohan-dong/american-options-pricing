@@ -30,10 +30,6 @@ enum OptionType
     call
 };
 
-void calcStockPricesTillTerminalTime(
-    const InputParams &params, const BinomialTreeParams &binomialTreeParams,
-    StockAndOptionPriceArray &stockAndOptionPricesArray);
-
 struct InputParams
 {
     float underlyingPrice;   // Current stock price
@@ -57,6 +53,10 @@ class BinomialTreeParams
     float discountRate;
     BinomialTreeParams(const InputParams &params);
 };
+
+void calcStockPricesTillTerminalTime(
+    const InputParams &params, const BinomialTreeParams &binomialTreeParams,
+    StockAndOptionPriceArray &stockAndOptionPricesArray);
 
 float binomialAmericanOption(const InputParams &params);
 } // namespace app
