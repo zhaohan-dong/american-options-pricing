@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include "bopm.hpp"
 
-void parseArguments(int argc, char *argv[], app::OptionParams &params)
+void parseArguments(int argc, char *argv[], app::InputParams &params)
 {
     int opt;
     bool interactiveMode = false;
@@ -14,22 +14,22 @@ void parseArguments(int argc, char *argv[], app::OptionParams &params)
         switch (opt)
         {
         case 'S':
-            params.S = std::stof(optarg);
+            params.underlyingPrice = std::stof(optarg);
             has_S = true;
             break;
         case 'K':
-            params.K = std::stof(optarg);
+            params.strike = std::stof(optarg);
             has_K = true;
             break;
         case 'r':
-            params.r = std::stof(optarg);
+            params.riskFreeRate = std::stof(optarg);
             has_r = true;
             break;
         case 'q':
-            params.q = std::stof(optarg);
+            params.dividendYield = std::stof(optarg);
             break;
         case 'T':
-            params.days_to_expiration = std::stof(optarg);
+            params.daysToExpiration = std::stof(optarg);
             has_T = true;
             break;
         case 's':
@@ -41,10 +41,10 @@ void parseArguments(int argc, char *argv[], app::OptionParams &params)
             has_n = true;
             break;
         case 'c':
-            params.isCall = true;
+            params.isCall = app::OptionType::call;
             break;
         case 'p':
-            params.isCall = false;
+            params.isCall = app::OptionType::put;
             break;
         case 'i':
             interactiveMode = true;
@@ -78,19 +78,19 @@ void parseArguments(int argc, char *argv[], app::OptionParams &params)
     {
         // Prompt for interactive input
         std::cout << "Enter stock price (S): ";
-        std::cin >> params.S;
+        std::cin >> params.underlyingPrice;
 
         std::cout << "Enter strike price (K): ";
-        std::cin >> params.K;
+        std::cin >> params.strike;
 
         std::cout << "Enter risk-free rate (r): ";
-        std::cin >> params.r;
+        std::cin >> params.riskFreeRate;
 
         std::cout << "Enter dividend yield (q): ";
-        std::cin >> params.q;
+        std::cin >> params.dividendYield;
 
         std::cout << "Enter days to expiration (T): ";
-        std::cin >> params.days_to_expiration;
+        std::cin >> params.daysToExpiration;
 
         std::cout << "Enter volatility (sigma): ";
         std::cin >> params.sigma;
@@ -101,13 +101,14 @@ void parseArguments(int argc, char *argv[], app::OptionParams &params)
         std::cout << "Enter option type (1 for call, 0 for put): ";
         int optionType;
         std::cin >> optionType;
-        params.isCall = (optionType == 1);
+        params.isCall = static_cast<app::OptionType>(
+            (optionType) == static_cast<int>(app::OptionType::call));
     }
 }
 
 int main(int argc, char *argv[])
 {
-    app::OptionParams params;
+    app::InputParams params;
 
     try
     {
