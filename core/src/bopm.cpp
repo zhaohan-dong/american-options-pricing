@@ -171,7 +171,7 @@ Results binomialAmericanOption(const app::InputParams &inputParams)
                      (*stockAndOptionPricesArray[1])[0].stockPrice);
     results.theta = ((*stockAndOptionPricesArray[2])[1].optionValue -
                      (*stockAndOptionPricesArray[0])[0].optionValue) /
-                    (2 * binomialTreeParams.dt);
+                    (2 * binomialTreeParams.dt) / DAYS_PER_YEAR;
 
     for (int i = 0; i <= inputParams.steps; ++i)
     {
