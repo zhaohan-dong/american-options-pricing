@@ -32,15 +32,14 @@ enum OptionType
 
 struct InputParams
 {
-    float underlyingPrice;   // Current stock price
-    float strike;            // Strike price
-    float riskFreeRate;      // Risk-free rate in decimal
-    float dividendYield = 0; // Dividend yield in decimal
-    float daysToExpiration;  // Time to maturity in days
-    float sigma;             // Volatility in decimal
+    float underlyingPrice;  // Current stock price
+    float strike;           // Strike price
+    float riskFreeRate;     // Risk-free rate in decimal
+    float dividendYield;    // Dividend yield in decimal
+    float daysToExpiration; // Time to maturity in days
+    float sigma;            // Volatility in decimal
     int steps; // Number of binomial steps (starting with 0, so total steps + 1)
-    OptionType isCall =
-        OptionType::call; // Option type (true for call, false for put)
+    OptionType isCall; // Option type (true for call, false for put)
 };
 
 class BinomialTreeParams
@@ -54,11 +53,15 @@ class BinomialTreeParams
     BinomialTreeParams(const InputParams &params);
 };
 
-void calcStockPricesTillTerminalTime(
-    const InputParams &params, const BinomialTreeParams &binomialTreeParams,
-    StockAndOptionPriceArray &stockAndOptionPricesArray);
+struct Results
+{
+    float price;
+    float delta;
+    float gamma;
+    float theta;
+};
 
-float binomialAmericanOption(const InputParams &params);
+Results binomialAmericanOption(const InputParams &params);
 } // namespace app
 
 #endif

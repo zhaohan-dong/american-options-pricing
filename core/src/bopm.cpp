@@ -41,7 +41,26 @@ void calcStockPricesTillTerminalTime(
     }
 }
 
-float binomialAmericanOption(const app::InputParams &inputParams)
+float calcDeltaAtNode(StockAndOptionPriceArray &stockAndOptionPricesArray,
+                      int step, int node)
+{
+    return ((*stockAndOptionPricesArray[step + 1])[node + 1].optionValue -
+            (*stockAndOptionPricesArray[step + 1])[node].optionValue) /
+           ((*stockAndOptionPricesArray[step + 1])[node + 1].stockPrice -
+            (*stockAndOptionPricesArray[step + 1])[node].stockPrice);
+}
+
+float calcOptionHoldValue(const float &riskNeutralProb,
+                          const float &nextStepUpPrice,
+                          const float &nextStepDownPrice,
+                          const float &discountRate)
+{
+    return (riskNeutralProb * nextStepUpPrice +
+            (1 - riskNeutralProb) * nextStepDownPrice) /
+           discountRate;
+}
+
+Results binomialAmericanOption(const app::InputParams &inputParams)
 {
 
     // Throw error if the steps exceeds max binomial steps set
@@ -54,6 +73,8 @@ float binomialAmericanOption(const app::InputParams &inputParams)
            << (MAXIMUM_BINOMIAL_STEPS - 1);
         throw std::runtime_error(ss.str());
     }
+
+    Results results;
 
     // Initialize the parameters like up/down factors
     BinomialTreeParams binomialTreeParams(inputParams);
@@ -86,11 +107,14 @@ float binomialAmericanOption(const app::InputParams &inputParams)
                       0.0f);
     }
 
+    // Temp variables to hold option values for comparison on early exercies
+    // Can also be stored as part of Node.optionPrice if we want to store these
+    // data at each node for future use
     float exerciseValue;
     float holdValue;
 
     // Repeating because we want to wrap the condition outside of loop
-    if (inputParams.isCall)
+    if (inputParams.isCall == OptionType::call)
     {
         for (int step = inputParams.steps - 1; step >= 0; --step)
         {
@@ -102,14 +126,12 @@ float binomialAmericanOption(const app::InputParams &inputParams)
                         inputParams.strike,
                     0.0f);
 
-                holdValue =
-                    (binomialTreeParams.riskNeutralProb *
-                         (*stockAndOptionPricesArray[step + 1])[node + 1]
-                             .optionValue +
-                     (1 - binomialTreeParams.riskNeutralProb) *
-                         (*stockAndOptionPricesArray[step + 1])[node]
-                             .optionValue) /
-                    binomialTreeParams.discountRate;
+                holdValue = calcOptionHoldValue(
+                    binomialTreeParams.riskNeutralProb,
+                    (*stockAndOptionPricesArray[step + 1])[node + 1]
+                        .optionValue,
+                    (*stockAndOptionPricesArray[step + 1])[node].optionValue,
+                    binomialTreeParams.discountRate);
 
                 (*stockAndOptionPricesArray[step])[node].optionValue =
                     std::max(exerciseValue, holdValue);
@@ -128,14 +150,12 @@ float binomialAmericanOption(const app::InputParams &inputParams)
                         (*stockAndOptionPricesArray[step])[node].stockPrice,
                     0.0f);
 
-                holdValue =
-                    (binomialTreeParams.riskNeutralProb *
-                         (*stockAndOptionPricesArray[step + 1])[node + 1]
-                             .optionValue +
-                     (1 - binomialTreeParams.riskNeutralProb) *
-                         (*stockAndOptionPricesArray[step + 1])[node]
-                             .optionValue) /
-                    binomialTreeParams.discountRate;
+                holdValue = calcOptionHoldValue(
+                    binomialTreeParams.riskNeutralProb,
+                    (*stockAndOptionPricesArray[step + 1])[node + 1]
+                        .optionValue,
+                    (*stockAndOptionPricesArray[step + 1])[node].optionValue,
+                    binomialTreeParams.discountRate);
 
                 (*stockAndOptionPricesArray[step])[node].optionValue =
                     std::max(exerciseValue, holdValue);
@@ -143,14 +163,22 @@ float binomialAmericanOption(const app::InputParams &inputParams)
         }
     }
 
-    float result = (*stockAndOptionPricesArray[0])[0].optionValue;
+    results.price = (*stockAndOptionPricesArray[0])[0].optionValue;
+    results.delta = calcDeltaAtNode(stockAndOptionPricesArray, 0, 0);
+    results.gamma = (calcDeltaAtNode(stockAndOptionPricesArray, 1, 1) -
+                     calcDeltaAtNode(stockAndOptionPricesArray, 1, 0)) /
+                    ((*stockAndOptionPricesArray[1])[1].stockPrice -
+                     (*stockAndOptionPricesArray[1])[0].stockPrice);
+    results.theta = ((*stockAndOptionPricesArray[2])[1].optionValue -
+                     (*stockAndOptionPricesArray[0])[0].optionValue) /
+                    (2 * binomialTreeParams.dt);
 
     for (int i = 0; i <= inputParams.steps; ++i)
     {
         delete stockAndOptionPricesArray[i];
     }
 
-    return result;
+    return results;
 }
 
 } // namespace app
