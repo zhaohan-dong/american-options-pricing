@@ -61,7 +61,7 @@ Results binomialAmericanOption(const app::InputParams &inputParams) {
         ss << "Specified number of binomial steps exceeded maximum set at "
               "compile time: "
            << (MAXIMUM_BINOMIAL_STEPS - 1);
-        throw std::runtime_error(ss.str());
+        throw std::invalid_argument(ss.str());
     }
 
     Results results;
