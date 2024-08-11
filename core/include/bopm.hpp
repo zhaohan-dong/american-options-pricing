@@ -11,11 +11,9 @@
 
 #include <array>
 
-namespace app
-{
+namespace app {
 
-struct Node
-{
+struct Node {
     float stockPrice;
     float optionValue;
 };
@@ -24,27 +22,22 @@ using StockAndOptionPriceStep = std::array<Node, MAXIMUM_BINOMIAL_STEPS>;
 using StockAndOptionPriceArray =
     std::array<StockAndOptionPriceStep *, MAXIMUM_BINOMIAL_STEPS>;
 
-enum OptionType
-{
-    put,
-    call
+enum OptionType { put, call };
+
+struct InputParams {
+    float underlyingPrice;   // Current stock price
+    float strike;            // Strike price
+    float riskFreeRate;      // Risk-free rate in decimal
+    float dividendYield;     // Dividend yield in decimal
+    float daysToExpiration;  // Time to maturity in days
+    float sigma;             // Volatility in decimal
+    int steps;  // Number of binomial steps (starting with 0, so total steps +
+                // 1)
+    OptionType isCall;  // Option type (true for call, false for put)
 };
 
-struct InputParams
-{
-    float underlyingPrice;  // Current stock price
-    float strike;           // Strike price
-    float riskFreeRate;     // Risk-free rate in decimal
-    float dividendYield;    // Dividend yield in decimal
-    float daysToExpiration; // Time to maturity in days
-    float sigma;            // Volatility in decimal
-    int steps; // Number of binomial steps (starting with 0, so total steps + 1)
-    OptionType isCall; // Option type (true for call, false for put)
-};
-
-class BinomialTreeParams
-{
-  public:
+class BinomialTreeParams {
+   public:
     float dt;
     float up;
     float down;
@@ -53,8 +46,7 @@ class BinomialTreeParams
     BinomialTreeParams(const InputParams &params);
 };
 
-struct Results
-{
+struct Results {
     float price;
     float delta;
     float gamma;
@@ -62,6 +54,6 @@ struct Results
 };
 
 Results binomialAmericanOption(const InputParams &params);
-} // namespace app
+}  // namespace app
 
 #endif
