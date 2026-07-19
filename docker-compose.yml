@@ -1,0 +1,14 @@
+services:
+  binomial-option-pricing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        IMAGE_VERSION: ${IMAGE_VERSION:-dev}
+        CORE_VERSION: ${CORE_VERSION:-0.0.0}
+    image: binomial-option-pricing:${IMAGE_VERSION:-dev}
+    environment:
+      PORT: 8080
+      JWT_SECRET: ChangeToASecureSecret
+    ports:
+      - "8080:8080"
